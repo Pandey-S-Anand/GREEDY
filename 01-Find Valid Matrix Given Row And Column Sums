@@ -1,0 +1,138 @@
+/*
+Example:
+
+Input:
+    rowSum = [5, 7, 10]
+    colSum = [8, 6, 8]
+
+Goal:
+    Build a 3x3 matrix such that:
+      - Each row sums up to rowSum[i]
+      - Each column sums up to colSum[j]
+      - All elements are non-negative
+
+Step-by-Step Assignment:
+
+1. Start at cell (0,0):
+   - rowSum[0] = 5, colSum[0] = 8 → min(5, 8) = 5
+   - Place 5 at (0,0)
+   - Update row and col sum:
+     rowSum = [0, 7, 10]
+     colSum = [3, 6, 8]
+   Matrix now:
+       [ [5, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0] ]
+
+2. Move to the next column in row 0: cell (0,1) (Implicit placement: Default value 0 as no rowSum left)
+   - rowSum[0] is already 0 → place 0
+   Matrix now:
+       [ [5, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0] ]
+
+3. Move to the next column in row 0: cell (0,2) (Implicit placement: Default value 0 as no rowSum left)
+   - rowSum[0] is already 0 → place 0
+   Matrix now:
+       [ [5, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0] ]
+
+   (Finished processing row 0)
+
+4. Move to the next row: cell (1,0)
+   - rowSum[1] = 7, colSum[0] = 3 → min(7, 3) = 3
+   - Place 3 at (1,0)
+   - Update row and col sum:
+     rowSum = [0, 4, 10]
+     colSum = [0, 6, 8]
+   Matrix now:
+       [ [5, 0, 0],
+         [3, 0, 0],
+         [0, 0, 0] ]
+
+5. Move to the next column in row 1: cell (1,1)
+   - rowSum[1] = 4, colSum[1] = 6 → min(4, 6) = 4
+   - Place 4 at (1,1)
+   - Update row and col sum:
+     rowSum = [0, 0, 10]
+     colSum = [0, 2, 8]
+   Matrix now:
+       [ [5, 0, 0],
+         [3, 4, 0],
+         [0, 0, 0] ]
+
+6. Move to the next column in row 1: cell (1,2) (Implicit placement: Default value 0 as no rowSum left)
+   - rowSum[1] is already 0 → place 0
+   Matrix now:
+       [ [5, 0, 0],
+         [3, 4, 0],
+         [0, 0, 0] ]
+
+   (Finished processing row 1)
+
+7. Move to the next row: cell (2,0) (Implicit placement: Default value 0 as no rowSum left)
+   - colSum[0] is already 0 → place 0
+   Matrix now:
+       [ [5, 0, 0],
+         [3, 4, 0],
+         [0, 0, 0] ]
+
+8. Move to the next column in row 2: cell (2,1)
+   - rowSum[2] = 10, colSum[1] = 2 → min(10, 2) = 2
+   - Place 2 at (2,1)
+   - Update row and col sum:
+     rowSum = [0, 0, 8]
+     colSum = [0, 0, 8]
+   Matrix now:
+       [ [5, 0, 0],
+         [3, 4, 0],
+         [0, 2, 0] ]
+
+9. Move to the next column in row 2: cell (2,2)
+   - rowSum[2] = 8, colSum[2] = 8 → min(8, 8) = 8
+   - Place 8 at (2,2)
+   - Update row and col sum:
+     rowSum = [0, 0, 0]
+     colSum = [0, 0, 0]
+   Matrix now:
+       [ [5, 0, 0],
+         [3, 4, 0],
+         [0, 2, 8] ]
+
+   (Finished processing row 2)
+
+Final Output:
+       [ [5, 0, 0],
+         [3, 4, 0],
+         [0, 2, 8] ]
+All row and column sums are satisfied.
+*/
+
+
+class Solution {
+    public int[][] restoreMatrix(int[] rowSum, int[] colSum) {
+        // Initialize the result matrix with given row and column dimensions
+        int[][] mat = new int[rowSum.length][colSum.length];
+
+        int row = 0, col = 0;
+
+        // Greedily fill the matrix until we exhaust either rowSum or colSum
+        while (row < rowSum.length && col < colSum.length) {
+            // Take the minimum of current rowSum and colSum to fill the cell
+            if (rowSum[row] < colSum[col]) {
+                mat[row][col] = rowSum[row]; // Fill cell with row's remaining sum
+                colSum[col] -= rowSum[row]; // Subtract from current column sum
+                rowSum[row] = 0; // Current row is fully used
+                row++; // Move to next row
+            } else {
+                mat[row][col] = colSum[col]; // Fill cell with column's remaining sum
+                rowSum[row] -= colSum[col]; // Subtract from current row sum
+                colSum[col] = 0; // Current column is fully used
+                col++; // Move to next column
+            }
+        }
+
+        return mat;
+    }
+}
