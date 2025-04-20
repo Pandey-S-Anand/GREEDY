@@ -10,6 +10,33 @@ class Solution {
          For any two intervals [a, b] and [c, d] such that a < c,
          we automatically get a < d, so to check for overlap we just need to verify if b > c
         */
+        /*
+        Dry Run with input: [[1,5],[2,3],[4,6],[5,9],[7,8]]
+        
+        Step 1: Sort intervals by start time
+        Sorted intervals: [[1,5], [2,3], [4,6], [5,9], [7,8]]
+        
+        previous = 0  → interval [1,5]
+        intervalsToRemove = 0
+        
+        current = 1 → interval [2,3]
+        → overlaps with [1,5] since 5 > 2 → increment intervalsToRemove = 1
+        → choose [2,3] (smaller end time), so previous = 1  (i.e remove [1,5])
+        
+        current = 2 → interval [4,6]
+        → no overlap with [2,3] since 3 <= 4
+        → update previous = 2
+        
+        current = 3 → interval [5,9]
+        → overlaps with [4,6] since 6 > 5 → OVERLAP,  so intervalsToRemove = 2 
+        → Choose [4,6] (since 6 < 9) (smaller end time) (i.e remove [5,9])
+        → So previous remains the same i.e previous = 2
+        
+        current = 4 → interval [7,8]
+        → no overlap with [4,6] since 6 <= 7 → update previous = 4
+        
+        Final: intervalsToRemove = 2
+        */
 
         // Step 1: Sort intervals based on start time
         Arrays.sort(intervals, (a, b) -> Integer.compare(a[0], b[0]));
@@ -44,3 +71,4 @@ class Solution {
         return intervalsToRemove;
     }
 }
+
