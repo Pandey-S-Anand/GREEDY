@@ -1,0 +1,46 @@
+class Solution {
+    public int eraseOverlapIntervals(int[][] intervals) {
+        /*
+         Given two intervals [a, b] and [c, d] with a < b and c < d,
+         and considering intervals that only touch at a point as non-overlapping,
+         the condition for these intervals to overlap is:
+         a < d and b > c
+        
+         After sorting the intervals by their start time:
+         For any two intervals [a, b] and [c, d] such that a < c,
+         we automatically get a < d, so to check for overlap we just need to verify if b > c
+        */
+
+        // Step 1: Sort intervals based on start time
+        Arrays.sort(intervals, (a, b) -> Integer.compare(a[0], b[0]));
+
+        int previous = 0; // Pointer to the last non-overlapping interval
+        int intervalsToRemove = 0; // Count of intervals to remove
+
+        // Step 2: Traverse from the second interval onward
+        for (int current = 1; current < intervals.length; current++) {
+
+            // Case 1: No overlap (previous ends before or exactly at current's start)
+            if (intervals[previous][1] <= intervals[current][0]) {
+                previous = current; // Move the window (or i++)
+            } else {
+                // Case 2: Overlap detected → must remove one interval
+                intervalsToRemove++;
+
+                // Subcase: previous interval has higher end time
+                if (intervals[previous][1] > intervals[current][1]) {
+                    // Skip the previous interval as it has a higher end time, which makes it more likely to overlap with future intervals 
+                    previous = current; // or i++
+                }
+                /*
+                 Subcase: current interval has higher end time
+                 Keep previous interval and move to the next interval (i.e current++)
+                 as it has a higher end time, which makes it more likely to overlap with future intervals
+                */
+            }
+        }
+
+        // Step 3: Return total number of intervals removed
+        return intervalsToRemove;
+    }
+}
