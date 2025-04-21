@@ -1,0 +1,113 @@
+//Intuitive approach
+
+class Solution {
+    /*
+     * Dry Run for Input:
+     * intervals = [[1,2], [3,4], [5,7], [6,9], [8,11], [10,12]]
+     * 
+     * 1. Sort by start time (already sorted here):
+     *    [[1,2], [3,4], [5,7], [6,9], [8,11], [10,12]]
+     * 
+     * Use a min-heap to track end times of rooms in use:
+     * 
+     * Step-by-step:
+     * 
+     * 1. Meeting [1,2]
+     *    – Heap is empty → allocate new room
+     *    – Push end time 2
+     *    Heap: [2]
+     * 
+     * 2. Meeting [3,4]
+     *    – 3 ≥ heap.peek() (2) → room freed → reuse
+     *    – Pop 2, then push 4
+     *    Heap: [4]
+     * 
+     * 3. Meeting [5,7]
+     *    – 5 ≥ heap.peek() (4) → room freed → reuse
+     *    – Pop 4, then push 7
+     *    Heap: [7]
+     * 
+     * 4. Meeting [6,9]
+     *    – 6 < heap.peek() (7) → no room free → allocate new room
+     *    – Push 9
+     *    Heap: [7, 9]
+     * 
+     * 5. Meeting [8,11]
+     *    – 8 ≥ heap.peek() (7) → room freed → reuse
+     *    – Pop 7, then push 11
+     *    Heap: [9, 11]
+     * 
+     * 6. Meeting [10,12]
+     *    – 10 ≥ heap.peek() (9) → room freed → reuse
+     *    – Pop 9, then push 12
+     *    Heap: [11, 12]
+     * 
+     * Final heap size = 2 → Minimum rooms needed = 2
+     * 
+     * Key scenarios covered:
+     * - First three meetings ([1,2], [3,4], [5,7]) are non‑overlapping and reuse the same room.
+     * - Fourth meeting ([6,9]) overlaps with [5,7], so a second room is allocated.
+     * - Subsequent meetings reuse freed rooms when possible (e.g., [8,11] reuses the room freed by [5,7]).
+     */
+
+    public int minMeetingRooms(int[] start, int[] end) {
+        /*
+         * Consider two meetings, meeting1[a, b] and meeting2[c, d] 
+         * (where a < b and c < d, i.e., start time < end time).
+         * These meetings will overlap if and only if:
+         * a < d and b > c.
+         * 
+         * When sorting the meetings by start time, we know that a < c 
+         * for consecutive meetings, which ensures that a < d as well.
+         * Therefore, we only need to check if the end time of the 
+         * previous meeting (b) is greater than the start time of the 
+         * next meeting (c) to detect overlaps.
+         */
+
+        int[][] meetings = new int[start.length][2];
+
+        // Step 1: Combine the start and end times into intervals for each meeting
+        for (int i = 0; i < start.length; i++) {
+            meetings[i][0] = start[i]; // The start time of the meeting
+            meetings[i][1] = end[i];   // The end time of the meeting
+        }
+
+        // Step 2: Sort the meetings by their start times in ascending order
+        Arrays.sort(meetings, (meeting1, meeting2) -> Integer.compare(meeting1[0], meeting2[0]));
+
+        /*
+         * Step 3: Min-heap helps to track the ongoing meetings by storing their end times.
+         * The top of the heap always contains the meeting with the earliest end time.
+         * If the meeting with the earliest end time ends before the current meeting starts, 
+         * we reuse that meeting room (pop from heap). Otherwise, a new room is needed 
+         * (push the current end time to heap).
+         * The size of the heap at the end gives the minimum number of rooms required.
+         */
+        Queue<Integer> minHeap = new PriorityQueue<>();
+
+        // Step 4: Process each meeting
+        for (int[] meeting : meetings) {
+            int currentStart = meeting[0]; // The start time of the current meeting
+            int currentEnd = meeting[1];   // The end time of the current meeting
+
+            /*
+             * Step 4.1: If the earliest end time in the heap is less than or equal 
+             * to the current start time, it means we can reuse the room (i.e., no overlap).
+             */
+            if (!minHeap.isEmpty() && minHeap.peek() <= currentStart) {
+                minHeap.poll(); // Remove the meeting that has ended and free up the room
+            }
+
+            
+            // Step 4.2: Allocate a new room for the current meeting (or reuse an existing room)
+            minHeap.offer(currentEnd); // Add the current meeting's end time to the heap
+        }
+
+        // Step 5: The size of the heap at the end tells us the minimum number of rooms required
+        return minHeap.size(); // Return the number of rooms needed (size of the heap)
+    }
+}
+
+
+//Optimal approach
+
