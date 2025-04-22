@@ -107,7 +107,3 @@ class Solution {
         return minHeap.size(); // Return the number of rooms needed (size of the heap)
     }
 }
-
-
-//Optimal approach
-
