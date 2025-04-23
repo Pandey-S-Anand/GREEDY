@@ -94,7 +94,11 @@ count = 4
 
         // Step 2: Sort meetings based on start time
         Arrays.sort(meetings, (m1, m2) -> Integer.compare(m1[0], m2[0]));
-
+        /*
+           lastMeetingIndex always refers to the most recently scheduled meeting in the room —
+           i.e., the last non-overlapping meeting we've chosen to keep as part of our greedy solution path.
+           It represents the meeting that currently occupies the room or just finished.
+        */
         int lastMeetingIndex = 0;
         int currentMeetingIndex = 1;
         int count = 1;
