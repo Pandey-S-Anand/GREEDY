@@ -1,0 +1,26 @@
+class Solution {
+    /*
+     * Approach:
+     * - Use a greedy strategy: buy the cheapest toys first to maximize count.
+     * - Sort the array of toy prices.
+     * - Iterate through the sorted array and buy as many toys as possible 
+     *   until the amount is exhausted.
+     */
+    static int toyCount(int n, int amount, int arr[]) {
+        // Step 1: Sort toy prices in ascending order (cheapest to most expensive)
+        Arrays.sort(arr);
+
+        int i = 0;       // Pointer to iterate through sorted prices
+        int count = 0;   // To count the number of toys bought
+
+        // Step 2: Buy toys while the current toy price is affordable
+        while (i < n && (amount - arr[i]) >= 0) {
+            count++;                // Buy the toy
+            amount = amount - arr[i];  // Deduct its price from total amount
+            i++;                    // Move to the next toy
+        }
+
+        // Step 3: Return the total number of toys bought
+        return count;
+    }
+}
