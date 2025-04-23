@@ -1,0 +1,135 @@
+class Solution {
+    /*
+    Overlapping Condition:
+    For two intervals [a, b] and [c, d] where a < b and c < d, the meetings overlap if and only if:
+
+    a < d
+    b >= c
+
+    So the crux is to maximize the number of non-overlapping intervals/meetings
+    to accommodate the maximum number of meetings in a single room — 
+    which will give us the answer.
+
+    So if there are non-overlapping intervals, we will keep increasing the count.
+
+    And if we encounter an overlapping interval,
+    we will keep the interval/meeting that is having the smaller end time
+    i.e., skip the one with larger end time...
+
+    The reason is because the larger end time means there is a greater possibility 
+    that more overlapping intervals would be encountered
+    if we would have kept the meeting with the larger end time.
+
+
+    Dry Run for:
+    start[] = [1, 4, 7, 10, 11, 12, 13, 14, 17, 20]
+    end[]   = [3, 6, 9, 14, 15, 13, 12, 15, 18, 22]
+
+    Meetings after pairing:
+    [ [1,3], [4,6], [7,9], [10,14], [11,15], [12,13], [13,12], [14,15], [17,18], [20,22] ]
+
+    Sorted by start time:
+    [ [1,3], [4,6], [7,9], [10,14], [11,15], [12,13], [13,12], [14,15], [17,18], [20,22] ]
+
+    Initialize:
+    count = 1
+    lastMeetingEnd = 3 (meeting = [1,3])
+
+    Step-by-step:
+
+    1. Meeting [4,6]
+       4 > 3 → No overlap → count = 2
+       ✅ Last meeting kept = [4,6]
+       lastMeetingEnd = 6
+
+    2. Meeting [7,9]
+       7 > 6 → No overlap → count = 3
+       ✅ Last meeting kept = [7,9]
+       lastMeetingEnd = 9
+
+    3. Meeting [10,14]
+       10 > 9 → No overlap → count = 4
+       ✅ Last meeting kept = [10,14]
+       lastMeetingEnd = 14
+
+    4. Meeting [11,15]
+       11 < 14 → Overlap  
+       currentMeetingEnd (15) > lastMeetingEnd (14) → ❌ Skip current [11,15]  
+       ✅ Last meeting kept = [10,14]
+       lastMeetingEnd = 14
+       count = 4
+
+    5. Meeting [12,13]
+       12 < 14 → Overlap  
+       currentMeetingEnd (13) < lastMeetingEnd (14) → ✅ Keep current [12,13], drop last  
+       ✅ Last meeting kept = [12,13]
+       lastMeetingEnd = 13
+
+    6. Meeting [13,12]
+       13 == 13 → Overlap (start == lastMeetingEnd)  
+       currentMeetingEnd (12) < lastMeetingEnd (13) → ✅ Keep current [13,12], drop last  
+       ✅ Last meeting kept = [13,12]
+       lastMeetingEnd = 12
+       count = 4
+
+    7. Meeting [14,15]
+       14 > 12 → No overlap → count = 5  
+       ✅ Last meeting kept = [14,15]
+       lastMeetingEnd = 15
+
+    8. Meeting [17,18]
+       17 > 15 → No overlap → count = 6  
+       ✅ Last meeting kept = [17,18]
+       lastMeetingEnd = 18
+
+    9. Meeting [20,22]
+       20 > 18 → No overlap → count = 7  
+       ✅ Last meeting kept = [20,22]
+       lastMeetingEnd = 22
+
+    ✅ Final Output: 7 meetings can be scheduled:
+       [1,3], [4,6], [7,9], [13,12], [14,15], [17,18], [20,22]
+    */
+
+    public int maxMeetings(int[] start, int[] end) {
+        int[][] meetings = new int[start.length][2];
+
+        // Step 1: Pair start and end times
+        for (int i = 0; i < start.length; i++) {
+            meetings[i] = new int[]{start[i], end[i]};
+        }
+
+        // Step 2: Sort meetings based on start time
+        Arrays.sort(meetings, (m1, m2) -> Integer.compare(m1[0], m2[0]));
+
+        int lastMeetingEnd = meetings[0][1];
+        int i = 1;
+        int count = 1;
+
+        // Step 3: Traverse remaining meetings
+        while (i < meetings.length) {
+            int currentMeetingStart = meetings[i][0];
+            int currentMeetingEnd = meetings[i][1];
+
+            // Case 1: No overlap
+            if (currentMeetingStart > lastMeetingEnd) {
+                count++;
+                // Schedule current meeting: update last meeting end time and move to next meeting
+                lastMeetingEnd = currentMeetingEnd;
+                i++;
+            } else {
+                // Case 2: Overlap detected
+                if (currentMeetingEnd >= lastMeetingEnd) {
+                    // Skip current meeting and keep the last one since it ends earlier than or equal to current
+                    i++;
+                } else {
+                    // Skip last meeting and keep current one since it ends earlier, reducing future overlaps
+                    lastMeetingEnd = currentMeetingEnd;
+                    i++;
+                }
+            }
+        }
+
+        return count;
+    }
+}
