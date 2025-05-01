@@ -1,0 +1,60 @@
+class Solution {
+    static int findPlatform(int arrival[], int departure[]) {
+        /*
+         * Consider two intervals, interval1[a, b] and interval2[c, d] 
+         * (where a <= b and c <= d, i.e., arrival time <= departure time).
+         * These intervals will overlap if and only if:
+         * a <= d and b >= c.
+         * (If one train is departing at a certain time and another is arriving at the exact same time,
+         * you cannot use the same platform for both.
+         * Therefore, you would need two separate platforms to handle this situation.
+         * That is, b == c is considered as an overlap.)
+         * When sorting the trains by arrival time, we know that a <= c 
+         * for consecutive trains, which ensures that a <= d as well.
+         * Therefore, we only need to check if the departure time of the 
+         * previous train (b) is greater than or equal to the arrival time of the 
+         * next train (c) to detect overlaps.
+         */
+
+        int n = arrival.length;
+        int[][] trains = new int[n][2];
+
+        // Step 1: Combine the arrival and departure times into intervals for each train
+        for (int i = 0; i < n; i++) {
+            trains[i][0] = arrival[i]; // Arrival time of the train
+            trains[i][1] = departure[i]; // Departure time of the train
+        }
+
+        // Step 2: Sort the trains by their arrival time in ascending order
+        Arrays.sort(trains, (t1, t2) -> Integer.compare(t1[0], t2[0]));
+
+        /*
+         * Step 3: Use a min-heap (priority queue) to track occupied platforms by storing train departure times.
+         * The top of the heap always contains the platform that will be free the earliest (i.e., train with earliest departure).
+         * If a train departs before the next one arrives (strictly <), we can reuse that platform (poll the heap).
+         * Otherwise, we need an additional platform (push current departure time).
+         * The size of the heap at any point represents the number of platforms currently occupied.
+         */
+        Queue<Integer> platformQueue = new PriorityQueue<>();
+
+        // Step 4: Process each train
+        for (int[] train : trains) {
+            int currentArrival = train[0];
+            int currentDeparture = train[1];
+
+            /*
+             * Step 4.1: If the earliest platform becomes free strictly before the arrival
+             * of the current train, we can reuse that platform (train already departed).
+             */
+            if (!platformQueue.isEmpty() && platformQueue.peek() < currentArrival) {
+                platformQueue.poll(); // Free the platform
+            }
+
+            // Step 4.2: Allocate platform to current train (new or reused)
+            platformQueue.offer(currentDeparture); // Occupy platform till current train departs
+        }
+
+        // Step 5: The size of the heap tells us the minimum number of platforms required
+        return platformQueue.size(); // Return the required number of platforms
+    }
+}
