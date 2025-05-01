@@ -1,0 +1,39 @@
+class Solution {
+    /*
+    * By sorting both arrays:
+    * - We always try to satisfy the least greedy child first using the smallest available cookie that can satisfy their greed.
+    * - This is a greedy strategy: if we can satisfy a child with a small cookie, we save larger cookies for greedier children who need them more.
+    * - This way, we can maximize the number of content children.
+    *
+    * For example:
+    * g = [10, 9, 8, 7] becomes [7, 8, 9, 10]
+    * s = [5, 6, 7, 8] becomes [5, 6, 7, 8]
+    *
+    * This ensures we never waste a large cookie on a less greedy child,
+    * preserving bigger cookies for children who cannot be satisfied with smaller ones.
+    */
+
+    public int findContentChildren(int[] g, int[] s) {
+        // Sort the greed factors of the children in ascending order
+        Arrays.sort(g);
+
+        // Sort the sizes of the cookies in ascending order
+        Arrays.sort(s);
+
+        int i = 0; // Pointer for children
+        int j = 0; // Pointer for cookies
+        int count = 0; // Count of content children
+
+        if (g[i] <= s[j]) {
+            // If the current cookie can satisfy the current child
+            count++; // One more child is content
+            i++; // Move to the next child
+            j++; // Move to the next cookie
+        } else {
+            // If the cookie is too small, try the next larger cookie
+            j++;
+        }
+
+        return count;
+    }
+}
