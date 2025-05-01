@@ -1,0 +1,60 @@
+class Solution {
+    public boolean lemonadeChange(int[] bills) {
+        // Track the number of 5s and 10s we have to give change
+        int deno5 = 0;
+        int deno10 = 0;
+
+        // Process each bill in the given array
+        for (int value : bills) {
+            if (value == 5) {
+                // No change needed, just increase the count of 5s
+                deno5++;
+            } else if (value == 10) {
+                if (deno5 == 0) {
+                    return false; // Not enough 5s to give change
+                }
+
+                // If customer pays with 10, we need 5 as change
+                deno5--; // Give one 5 as change
+                deno10++; // Now we have one more 10
+            } else if (value == 20) {
+                /**
+                * When a customer pays with ₹20, we must give ₹15 as change.
+                * 
+                * There are 3 main scenarios for giving ₹15:
+                * 
+                * 1. If we have at least 1 ten (₹10) and at least 1 five (₹5):
+                *    - Always prefer giving 1 ten + 1 five.
+                *    - This conserves ₹5 notes for future use.
+                *    - Example:
+                *      Input: [5, 5, 5, 5, 10, 20, 10]
+                *      At index = 5, we have 1 ten and 3 fives.
+                *      The current customer pays with ₹20 → we need to give ₹15 change.
+                *      If we give 3 fives now, and the next customer pays with ₹10,
+                *      we won't have any ₹5 left to give change.
+                *      So giving 1 ten and 1 five is smarter.
+                * 
+                * 2. If we don’t have any tens but have at least 3 fives:
+                *    - Then we give three ₹5 notes.
+                *    - This is the only option left to make ₹15 if ₹10 is unavailable.
+                * 
+                * 3. If we don’t have at least one ten and don’t have 3 fives either:
+                *    - We can't make ₹15 change → return false.
+                */
+                if (deno10 > 0 && deno5 > 0) {
+                    // Prefer giving one 10 and one 5
+                    deno10--;
+                    deno5--;
+                } else if (deno5 >= 3) {
+                    // Or, give three 5s
+                    deno5 -= 3;
+                } else {
+                    return false; // Not enough change to give 15
+                }
+            }
+        }
+
+        // If we successfully give change for all bills, return true
+        return true;
+    }
+}
