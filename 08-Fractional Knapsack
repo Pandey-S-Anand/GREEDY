@@ -1,0 +1,77 @@
+class Solution {
+    /**
+     * Fractional Knapsack Problem Explanation:
+     * 
+     * Q1: Why not sort items by value?
+     *     Example: (value, weight) = [100, 10], [120, 85], capacity = 90
+     *     - Sorting by value gives:
+     *         Pick [120, 85] → 5 capacity left
+     *         Pick 5 units of [100, 10] → value = 50
+     *         Total = 120 + 50 = 170
+     *     - Optimal:
+     *         Pick [100, 10] fully → value = 100, remaining = 80
+     *         Pick 80/85 of [120, 85] → value = (120/85)*80 ≈ 112.94
+     *         Total = 100 + 112.94 = 212.94
+     *     → Conclusion: Sorting by value is greedy but not optimal.
+     * 
+     * Q2: Why not sort items by smallest weight?
+     *     Example: (value, weight) = [10, 18], [120, 20], capacity = 20
+     *     - Sorting by weight gives:
+     *         Pick [10, 18] → 2 capacity left
+     *         Pick 2 units of [120, 20] → value = 12
+     *         Total = 10 + 12 = 22
+     *     - Optimal:
+     *         Pick [120, 20] fully → value = 120
+     *     → Conclusion: Sorting by weight is not optimal either.
+     * 
+     * ✅ Correct Strategy:
+     *     - Sort items by value-to-weight ratio (value / weight)
+     *     - It chooses the item that gives the most value per unit of weight.
+     *     - This ensures we maximize value for every bit of capacity we have.
+     *     - Greedy strategy works optimally in fractional knapsack.
+     */
+
+    double fractionalKnapsack(int[] values, int[] weights, int capacity) {
+        int n = values.length;
+
+        // Step 1: Build an array of items where each item = [weight, value]
+        int[][] items = new int[n][2];
+        for (int i = 0; i < n; i++) {
+            items[i][0] = weights[i];
+            items[i][1] = values[i];
+        }
+
+        // Step 2: Sort items by descending value-to-weight ratio
+        Arrays.sort(items, (item1, item2) -> {
+            double ratio1 = (double) item1[1] / item1[0];  // value/weight for item1
+            double ratio2 = (double) item2[1] / item2[0];  // value/weight for item2
+            return Double.compare(ratio2, ratio1);         // sort in descending order
+        });
+
+        double totalValue = 0.0;  // Final accumulated value
+        int index = 0;
+
+        // Step 3: Take full items as long as capacity allows
+        while (index < n && capacity >= items[index][0]) {
+            int currentWeight = items[index][0];
+            int currentValue = items[index][1];
+
+            capacity -= currentWeight;
+            totalValue += currentValue;
+
+            index++;
+        }
+
+        // Step 4: If capacity left, take fractional part of the next item
+        if (index < n && capacity > 0) {
+            int remainingWeight = capacity;
+            int nextItemWeight = items[index][0];
+            int nextItemValue = items[index][1];
+
+            double valuePerUnit = (double) nextItemValue / nextItemWeight;
+            totalValue += valuePerUnit * remainingWeight;
+        }
+
+        return totalValue;
+    }
+}
