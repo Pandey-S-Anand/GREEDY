@@ -105,12 +105,13 @@ class Solution {
         // Step 3: Right to Left Pass
         int totalCandies = candies[ratings.length - 1]; // start from last child's candies
         for (int i = ratings.length - 2; i >= 0; i--) {
-            /* 
-            If a child has a higher rating than the right neighbor, give them more candies than the right neighbor.
-            We use Math.max to keep the higher candy count already given in the left-to-right pass.
-            This helps when the child needs more candies than both neighbors —
-            so we make sure they get at least one more than the neighbor with the most candies.
+            /*
+            When a child has a higher rating than the right neighbor, they should receive more candies than the right neighbor.
+            We use Math.max to retain the maximum candy count from the left-to-right pass, ensuring the child gets at least one more candy than the neighbor with the most candies.
+            To minimize the total number of candies, we aim to give the child the smallest number of candies that satisfies the condition.
+            Therefore, we assign the child the greater of the candies given to the left or right neighbor, plus one.
             */
+
             if (ratings[i] > ratings[i + 1]) {
                 candies[i] = Math.max(candies[i], candies[i + 1] + 1);
             }
