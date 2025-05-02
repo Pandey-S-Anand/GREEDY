@@ -1,0 +1,107 @@
+//Naive approach
+
+class Solution {
+    public int maxIceCream(int[] costs, int coins) {
+        /*
+         Why do we sort?
+         ----------------
+         We sort the ice cream costs in ascending order because we want to buy 
+         the cheapest ice creams first. This allows us to maximize the total 
+         number of ice creams we can purchase with the available coins.
+         
+         By picking the cheaper ones earlier, we spend less per item and can 
+         increase the count of total ice creams bought.
+        */
+        Arrays.sort(costs);
+
+        int count = 0;
+
+        // Buy ice creams until we run out of coins
+        for (int i = 0; i < costs.length && coins >= costs[i]; i++) {
+            coins -= costs[i];  // Deduct the cost of current ice cream
+            count++;            // Increment number of ice creams bought
+        }
+
+        return count;
+    }
+}
+
+
+//Optimal approach
+
+class Solution {
+    /*
+        ✅ Why Counting Sort?
+        ----------------------
+        - We are not interested in the order of costs; we just want to buy the cheapest ones first.
+        - Instead of sorting the array with O(n log n), we count how many ice creams are available at each cost.
+        - This gives us an O(n + maxCost) solution, which is faster when costs[i] are small integers (e.g., ≤ 10⁴).
+    
+        🔄 Dry Run:
+        ----------
+        Input: costs = [1, 3, 2, 1, 4], coins = 7
+    
+        Step 1: Count frequency of each cost
+            freq[1] = 2 → we have 2 ice creams of cost = 1
+            freq[2] = 1 → we have 1 ice cream of cost = 2
+            freq[3] = 1 → we have 1 ice cream of cost = 3
+            freq[4] = 1 → we have 1 ice cream of cost = 4
+    
+        Step 2: Try to buy cheapest ice creams first
+            - cost = 1, freq = 2 → Buy both → remaining coins = 5, iceCreamsBought = 2
+            - cost = 2, freq = 1 → Buy 1    → remaining coins = 3, iceCreamsBought = 3
+            - cost = 3, freq = 1 → Buy 1    → remaining coins = 0, iceCreamsBought = 4
+            - cost = 4 → can't afford
+    
+        ✅ Output: 4 ice creams
+    */
+    public int maxIceCream(int[] costs, int coins) {
+        // Step 1: Find the maximum cost to determine size of the frequency array
+        int maxCost = findMaxInArray(costs);
+
+        // Step 2: Count frequency of each cost i.e., how many ice creams are available at each price
+        int[] freq = new int[maxCost + 1];
+        for (int cost : costs) {
+            freq[cost]++;
+        }
+
+        // Step 3: Buy the cheapest ice creams first
+        int iceCreamsBought = 0;
+        for (int cost = 1; cost <= maxCost; cost++) {
+            // 🔁 No ice creams available at this cost, skip to the next cost
+            if (freq[cost] == 0) {
+                continue;
+            }
+
+            int totalCostAtThisPrice = cost * freq[cost];
+
+            if (coins >= totalCostAtThisPrice) {
+                // Can buy all ice creams at this price
+                iceCreamsBought += freq[cost];
+                coins -= totalCostAtThisPrice;
+            } else {
+                // Can only afford a few
+                int affordableCount = coins / cost;
+                iceCreamsBought += affordableCount;
+                coins -= affordableCount * cost;
+
+                /*
+                 At this point, coins < current cost.
+                 Since costs are processed in increasing order,
+                 we can't afford any further ice creams.
+                 */
+                break;
+            }
+        }
+
+        return iceCreamsBought;
+    }
+
+    private int findMaxInArray(int[] arr) {
+        int max = 0;
+        for (int num : arr) {
+            max = Math.max(max, num);
+        }
+        return max;
+    }
+}
