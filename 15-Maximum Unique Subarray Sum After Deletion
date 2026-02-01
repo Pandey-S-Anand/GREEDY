@@ -1,0 +1,84 @@
+//Naive implementation
+
+class Solution {
+    /*
+     * Problem Description:
+     * --------------------
+     * You are given an integer array.
+     *
+     * You may:
+     *   1. Delete ANY number of elements (but the array must not become empty).
+     *   2. Then select ONE subarray such that:
+     *        - All elements are UNIQUE
+     *        - The sum is MAXIMIZED
+     *
+     * Key Insight:
+     * ------------
+     * Since deletions are allowed BEFORE selecting the subarray,
+     * the chosen subarray does NOT need to be contiguous in the original array.
+     *
+     * Optimal Strategy:
+     * -----------------
+     *   - Include each UNIQUE POSITIVE number once
+     *   - Exclude negative numbers (they reduce the sum)
+     *
+     * Edge Case:
+     * ----------
+     * If all numbers are negative, we must still pick one element.
+     * In that case, return the maximum (least negative) value.
+     */
+    public int maxSum(int[] arr) {
+        Set<Integer> seen = new HashSet<>();
+
+        int sum = 0; // Sum of unique positive elements
+        int maxNegativeNum = Integer.MIN_VALUE; // Tracks the maximum negative (or zero) value
+
+        for (int num : arr) {
+            // Add only unique positive numbers
+            if (num > 0 && !seen.contains(num)) {
+                sum += num;
+                seen.add(num);
+            }
+
+            // Track the maximum value seen (used only when all numbers are non-positive)
+            maxNegativeNum = Math.max(maxNegativeNum, num);
+        }
+
+        /*
+         * If at least one positive number was added, 'sum' is the answer.
+         * Otherwise, all numbers were non-positive, so return maxNegativeNum.
+         */
+        return sum == 0 ? maxNegativeNum : sum;
+    }
+}
+
+
+//Optimal implementation
+
+class Solution {
+    public int maxSum(int[] arr) {
+        /* 
+        * Why we use a boolean array instead of HashSet:
+        * -----------------------------------------------
+        * The problem constraints guarantee:
+        *   -100 <= nums[i] <= 100
+        *
+        * Since we are only interested in POSITIVE numbers,
+        * their range is limited to [1..100].
+        */
+        boolean[] seen = new boolean[101];
+
+        int sum = 0;
+        int maxNum = Integer.MIN_VALUE;
+
+        for (int num : arr) {
+            if (num > 0 && !seen[num]) {
+                sum += num;
+                seen[num] = true;
+            }
+            maxNum = Math.max(maxNum, num);
+        }
+
+        return sum == 0 ? maxNum : sum;
+    }
+}
