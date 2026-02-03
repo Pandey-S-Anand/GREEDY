@@ -1,0 +1,40 @@
+class Complete {
+    /**
+     * This method ensures the array becomes strictly increasing
+     * by incrementing elements when needed, while keeping the
+     * total sum minimum.
+     *
+     * Logic:
+     * - Traverse from left to right.
+     * - If current element is less than or equal to previous,
+     *   increment it to (previous + 1).
+     * - Keep adding each element to the sum.
+     *
+     * Example:
+     * Input  : {1, 2, 4, 5, 6, 6, 6, 7,  9, 10, 10, 11, 11, 25, 28, 28, 35, 40, 45 }
+     * Output : {1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 25, 28, 29, 35, 40, 45 }
+     *
+     * To keep the total sum minimum, we increment an element only when it is necessary
+     * and by the smallest possible value, i.e., (previous + 1).
+     * Any larger increment would unnecessarily increase the sum,
+     * which goes against the goal of achieving the minimum possible sum.
+    */
+    public static long minSum(int arr[], int n) {
+        // Initialize sum with first element
+        long sum = arr[0];
+
+        // Traverse the array starting from second element
+        for (int i = 1; i < n; i++) {
+            // If current element is not strictly greater than previous, make it exactly one greater than previous
+            if (arr[i] <= arr[i - 1]) {
+                arr[i] = arr[i - 1] + 1;
+            }
+
+            // Add current element to sum
+            sum += arr[i];
+        }
+
+        // Return the minimum possible sum
+        return sum;
+    }
+}
